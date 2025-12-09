@@ -1,4 +1,5 @@
 #BarberKush
+
 BarberKush – Sistema de Gestão para Barbearias
 
 Descrição do Sistema
