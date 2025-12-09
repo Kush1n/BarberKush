@@ -8,10 +8,6 @@ CREATE TABLE cliente (
     email VARCHAR(100),
     data_cadastro DATE NOT NULL
 );
-
--- ============================
--- TABELA PROFISSIONAL
--- ============================
 CREATE TABLE profissional (
     id_profissional INT AUTO_INCREMENT PRIMARY KEY,
     nome VARCHAR(100) NOT NULL,
