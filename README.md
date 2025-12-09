@@ -1,55 +1,83 @@
 # BarberKush
-Sistema: BarberKush
+
+BarberKush – Sistema de Gestão para Barbearias
 
 Descrição do Sistema
 
-O BarberKush será um sistema web para gerenciamento completo de uma barbearia.
-Ele permitirá controlar clientes, serviços, barbearias, agendamentos, e profissionais.
-O objetivo é organizar o fluxo da barbearia, evitando conflitos de horários e garantindo melhor atendimento.
+O BarberKush é um sistema web desenvolvido para gerenciar o funcionamento de uma barbearia, oferecendo controle completo de clientes, serviços, barbeiros, agendamentos e pagamentos.
+O objetivo do sistema é facilitar o atendimento, evitar conflitos de horários, melhorar a organização e garantir mais eficiência no gerenciamento diário da barbearia.
+O sistema permite:
+Cadastrar e gerenciar clientes, barbeiros e serviços.
+Realizar agendamentos com verificação de conflitos.
+Controlar status do agendamento (agendado, concluído, cancelado).
+Calcular valores automaticamente com base nos serviços escolhidos.
+Evitar registros duplicados.
+Criar um histórico completo dos atendimentos.
 
 Entidades e Atributos
+   
 1. Cliente
-id_cliente
+id_cliente (PK)
 nome
 telefone
 email
 data_cadastro
 
-3. Profissional (Barbeiro)
-id_profissional
+2. Barbeiro
+id_barbeiro (PK)
 nome
-especialidade
 telefone
+especialidade
 status (ativo/inativo)
 
 3. Serviço
-id_servico
-nome_servico
+id_servico (PK)
+nome
 descricao
 valor
-tempo_estimado (minutos)
+duracao (em minutos)
 
 4. Agendamento
-id_agendamento
+id_agendamento (PK)
 id_cliente (FK)
-id_profissional (FK)
+id_barbeiro (FK)
 id_servico (FK)
 data
 hora
-status (pendente, concluído, cancelado)
+status (agendado, concluído, cancelado)
+valor_total
 
-5. Pagamento
-id_pagamento
+5. Pagamento (opcional, mas deixa mais completo)
+id_pagamento (PK)
 id_agendamento (FK)
 valor
-forma_pagamento (PIX, cartão, dinheiro)
+forma_pagamento (dinheiro, cartão, pix)
 data_pagamento
 
-Regras de Negócio (mínimo 5)
-1. Um agendamento não pode ser criado se o barbeiro já estiver ocupado no mesmo horário.
-(Impede conflitos de horário.)
-2. Não é possível marcar um agendamento para um cliente sem preencher nome e telefone.
-(Dados obrigatórios.)
-3. O pagamento só pode ser registrado após o serviço ser concluído.
-4. Serviços devem ter preço maior que zero e tempo estimado informado.
-5. Um profissional só pode receber agendamentos se estiver com status “ativo”.
+Regras de Negócio (mínimo 5 — aqui tem 8 para ficar completo)
+   
+1. Não permitir agendamento em horários ocupados
+Antes de criar um agendamento, o sistema deve verificar se o barbeiro já possui outro atendimento naquele horário.
+
+2. Impedir cadastro duplicado de clientes
+Não deve ser permitido cadastrar dois clientes com o mesmo telefone ou e-mail.
+
+3. Calcular valor automático do agendamento
+O valor_total deve ser preenchido automaticamente com base no valor do serviço escolhido.
+
+4. Barbeiros inativos não podem receber novos agendamentos
+Se o barbeiro estiver com status = "inativo", o sistema deve bloquear agendamentos com ele.
+
+5. Cancelamento somente antes do horário marcado
+O sistema deve impedir cancelar agendamentos que já estão concluídos ou que o horário já passou.
+
+6. Impedir exclusão de clientes com agendamentos vinculados
+Só poderá excluir um cliente se ele não tiver agendamentos ativos ou concluídos.
+
+7. Impedir exclusão de serviços vinculados
+Um serviço só poderá ser excluído se não existir nenhum agendamento utilizando aquele serviço.
+
+8. Validar formatos de dados
+Telefone deve seguir formato válido (ex.: (31) 99999-9999)
+E-mail deve ter formato padrão
+Data não pode ser retroativa
