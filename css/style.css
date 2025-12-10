@@ -1,0 +1,37 @@
+html, body {
+    height: 100%;
+    margin: 0;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    background: #f8f9fa;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+header, footer {
+    background-color: #1c1c1c;
+    color: #fff;
+}
+
+main {
+    flex: 1;
+}
+
+footer {
+    text-align: center;
+    padding: 15px 0;
+}
+
+
+header a, footer a {
+    color: #fff;
+    text-decoration: none;
+    margin-right: 15px;
+}
+
+header a:hover, footer a:hover {
+    color: #ffc107; 
+    text-decoration: underline;
+}
