@@ -3,7 +3,6 @@ require_once "../../includes/db.php";
 require_once "../../includes/header.php";
 require_once "../../includes/token.php";
 
-// Gera CSRF token
 generate_csrf();
 
 if (!isset($_GET['id'])) {
@@ -65,7 +64,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 $data_hora_inicio = $data . ' ' . $hora;
                 $data_hora_fim = date('Y-m-d H:i:s', strtotime("+$duracao minutes", strtotime($data_hora_inicio)));
 
-                // Verifica conflito de horários
                 $stmt = $pdo->prepare("
                     SELECT COUNT(*) FROM agendamentos
                     WHERE id_barbeiro = ?

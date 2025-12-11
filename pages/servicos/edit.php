@@ -7,7 +7,6 @@ generate_csrf();
 
 $id = $_GET['id'] ?? 0;
 
-// Busca o serviço pelo ID
 $stmt = $pdo->prepare("SELECT * FROM servicos WHERE id_servico = ?");
 $stmt->execute([$id]);
 $servico = $stmt->fetch();

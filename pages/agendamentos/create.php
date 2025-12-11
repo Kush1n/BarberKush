@@ -3,7 +3,6 @@ require_once "../../includes/db.php";
 require_once "../../includes/header.php";
 require_once "../../includes/token.php";
 
-// Gera CSRF token
 generate_csrf();
 
 $hora_inicio = 9; 
@@ -11,24 +10,19 @@ $hora_fim = 19;
 $erros = [];
 $sucesso = "";
 
-// Busca clientes, barbeiros e serviços ativos
 $clientes = $pdo->query("SELECT id_cliente, nome FROM clientes")->fetchAll();
 $barbeiros = $pdo->query("SELECT id_barbeiro, nome FROM barbeiros WHERE ativo = 1")->fetchAll();
 $servicos = $pdo->query("SELECT id_servico, nome, duracao_min FROM servicos WHERE ativo = 1")->fetchAll();
 
-// Intervalos de horários de 30 em 30 minutos
 $intervalos = [];
 for ($h = $hora_inicio; $h < $hora_fim; $h++) {
     $intervalos[] = sprintf("%02d:00", $h);
     $intervalos[] = sprintf("%02d:30", $h);
 }
 
-// Data mínima (amanhã)
 $data_minima = date('Y-m-d', strtotime('+1 day'));
 
-// Processa envio do formulário
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Garante que o CSRF está definido
     $csrf_token = $_POST['csrf'] ?? '';
     if (!check_csrf($csrf_token)) {
         $erros[] = "Token inválido.";
@@ -39,17 +33,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $data_inicio_input = $_POST['data_inicio'] ?? '';
         $hora_inicio_input = $_POST['hora_inicio'] ?? '';
 
-        // Valida campos obrigatórios
         if (!$id_cliente || !$id_barbeiro || !$id_servico || !$data_inicio_input || !$hora_inicio_input) {
             $erros[] = "Preencha todos os campos.";
         }
 
-        // Valida data mínima
         if ($data_inicio_input < $data_minima) {
             $erros[] = "Não é possível agendar para hoje ou datas anteriores.";
         }
 
-        // Busca duração do serviço
         $stmt = $pdo->prepare("SELECT duracao_min FROM servicos WHERE id_servico = ?");
         $stmt->execute([$id_servico]);
         $duracao = $stmt->fetchColumn();
@@ -67,7 +58,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $erros[] = "O horário deve estar entre {$hora_inicio}:00 e {$hora_fim}:00.";
             }
 
-            // Verifica conflito de horários
             $stmt = $pdo->prepare("
                 SELECT COUNT(*) FROM agendamentos
                 WHERE id_barbeiro = ?
@@ -83,7 +73,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
 
-        // Inserção se não houver erros
         if (empty($erros)) {
             $stmt = $pdo->prepare("
                 INSERT INTO agendamentos 

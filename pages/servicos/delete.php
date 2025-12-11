@@ -7,7 +7,6 @@ $token = generate_csrf();
 
 $id = $_GET['id'] ?? 0;
 
-// Busca o serviço
 $stmt = $pdo->prepare("SELECT * FROM servicos WHERE id_servico = ?");
 $stmt->execute([$id]);
 $servico = $stmt->fetch();
@@ -16,7 +15,6 @@ if (!$servico) {
     die("Serviço não encontrado.");
 }
 
-// Verifica se o serviço está vinculado a algum agendamento
 $check = $pdo->prepare("SELECT id_agendamento FROM agendamentos WHERE id_servico = ?");
 $check->execute([$id]);
 
@@ -24,7 +22,6 @@ if ($check->rowCount() > 0) {
     die("<div class='alert alert-danger'>Não é possível excluir: serviço vinculado a agendamentos.</div>");
 }
 
-// Processa exclusão
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!check_csrf($_POST['csrf'])) {
         die("Ação não autorizada (CSRF inválido).");
