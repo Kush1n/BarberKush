@@ -1,16 +1,8 @@
 <?php
 require_once "../../includes/db.php";
-<<<<<<< HEAD
 require_once "../../includes/token.php";
 require_once "../../includes/header.php";
 
-=======
-require_once "../../includes/auth.php";
-require_once "../../includes/token.php";
-require_once "../../includes/header.php";
-
-require_login();
->>>>>>> 7ce0ecb848a22d768f1366395108cce54cd029c4
 $token = generate_csrf();
 
 $id = $_GET['id'] ?? 0;
@@ -31,7 +23,6 @@ if ($check->rowCount() > 0) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-<<<<<<< HEAD
     if (!check_csrf($_POST['csrf'])) {
         die("Ação não autorizada (CSRF inválido).");
     }
@@ -45,19 +36,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         echo '<div class="alert alert-danger">Erro ao excluir serviço.</div>';
     }
-=======
-
-    if (!verify_csrf($_POST['csrf'])) {
-        die("Ação não autorizada.");
-    }
-
-    $del = $pdo->prepare("DELETE FROM servicos WHERE id_servico = ?");
-    $del->execute([$id]);
-
-    $_SESSION['msg'] = "Serviço excluído com sucesso!";
-    header("Location: index.php");
-    exit;
->>>>>>> 7ce0ecb848a22d768f1366395108cce54cd029c4
 }
 ?>
 
