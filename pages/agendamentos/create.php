@@ -1,73 +1,105 @@
 <?php
 require_once "../../includes/db.php";
 require_once "../../includes/header.php";
+require_once "../../includes/token.php";
+
+// Gera CSRF token
+generate_csrf();
 
 $hora_inicio = 9; 
 $hora_fim = 19;   
 $erros = [];
+$sucesso = "";
 
+// Busca clientes, barbeiros e serviços ativos
 $clientes = $pdo->query("SELECT id_cliente, nome FROM clientes")->fetchAll();
 $barbeiros = $pdo->query("SELECT id_barbeiro, nome FROM barbeiros WHERE ativo = 1")->fetchAll();
 $servicos = $pdo->query("SELECT id_servico, nome, duracao_min FROM servicos WHERE ativo = 1")->fetchAll();
 
+// Intervalos de horários de 30 em 30 minutos
 $intervalos = [];
 for ($h = $hora_inicio; $h < $hora_fim; $h++) {
     $intervalos[] = sprintf("%02d:00", $h);
     $intervalos[] = sprintf("%02d:30", $h);
 }
 
+// Data mínima (amanhã)
 $data_minima = date('Y-m-d', strtotime('+1 day'));
 
+// Processa envio do formulário
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $id_cliente = $_POST['id_cliente'];
-    $id_barbeiro = $_POST['id_barbeiro'];
-    $id_servico = $_POST['id_servico'];
-    $data_inicio = $_POST['data_inicio'];
-    $hora_inicio_input = $_POST['hora_inicio'];
-
-    if ($data_inicio < $data_minima) {
-        $erros[] = "Não é possível agendar para hoje ou datas anteriores. Escolha o dia seguinte ou posterior.";
-    }
-
-    $stmt = $pdo->prepare("SELECT duracao_min FROM servicos WHERE id_servico = ?");
-    $stmt->execute([$id_servico]);
-    $duracao = $stmt->fetchColumn();
-
-    if (!$duracao) {
-        $erros[] = "Serviço inválido ou sem duração definida.";
+    // Garante que o CSRF está definido
+    $csrf_token = $_POST['csrf'] ?? '';
+    if (!check_csrf($csrf_token)) {
+        $erros[] = "Token inválido.";
     } else {
-        $data_hora_inicio = $data_inicio . ' ' . $hora_inicio_input;
-        $data_hora_fim = date('Y-m-d H:i:s', strtotime("+$duracao minutes", strtotime($data_hora_inicio)));
+        $id_cliente = $_POST['id_cliente'] ?? '';
+        $id_barbeiro = $_POST['id_barbeiro'] ?? '';
+        $id_servico = $_POST['id_servico'] ?? '';
+        $data_inicio_input = $_POST['data_inicio'] ?? '';
+        $hora_inicio_input = $_POST['hora_inicio'] ?? '';
 
-        $hora_apontada = (int)date('H', strtotime($data_hora_inicio));
-        if ($hora_apontada < $hora_inicio || $hora_apontada >= $hora_fim) {
-            $erros[] = "O horário deve estar entre {$hora_inicio}:00 e {$hora_fim}:00.";
+        // Valida campos obrigatórios
+        if (!$id_cliente || !$id_barbeiro || !$id_servico || !$data_inicio_input || !$hora_inicio_input) {
+            $erros[] = "Preencha todos os campos.";
         }
 
-        $stmt = $pdo->prepare("
-            SELECT COUNT(*) FROM agendamentos
-            WHERE id_barbeiro = ?
-              AND status IN ('pendente','confirmado')
-              AND (
-                    (data_inicio < ? AND data_fim > ?) OR
-                    (data_inicio < ? AND data_fim > ?)
-                  )
-        ");
-        $stmt->execute([$id_barbeiro, $data_hora_fim, $data_hora_inicio, $data_hora_fim, $data_hora_inicio]);
-        if ($stmt->fetchColumn() > 0) {
-            $erros[] = "O barbeiro já possui agendamento neste horário.";
+        // Valida data mínima
+        if ($data_inicio_input < $data_minima) {
+            $erros[] = "Não é possível agendar para hoje ou datas anteriores.";
         }
-    }
 
-    if (empty($erros)) {
-        $stmt = $pdo->prepare("
-            INSERT INTO agendamentos 
-            (id_cliente, id_barbeiro, id_servico, data_inicio, data_fim, status, criado_em)
-            VALUES (?, ?, ?, ?, ?, 'pendente', NOW())
-        ");
-        $stmt->execute([$id_cliente, $id_barbeiro, $id_servico, $data_hora_inicio, $data_hora_fim]);
-        header("Location: index.php");
-        exit;
+        // Busca duração do serviço
+        $stmt = $pdo->prepare("SELECT duracao_min FROM servicos WHERE id_servico = ?");
+        $stmt->execute([$id_servico]);
+        $duracao = $stmt->fetchColumn();
+
+        if (!$duracao) {
+            $erros[] = "Serviço inválido ou sem duração definida.";
+        }
+
+        if (empty($erros)) {
+            $data_hora_inicio = $data_inicio_input . ' ' . $hora_inicio_input;
+            $data_hora_fim = date('Y-m-d H:i:s', strtotime("+$duracao minutes", strtotime($data_hora_inicio)));
+
+            $hora_apontada = (int)date('H', strtotime($data_hora_inicio));
+            if ($hora_apontada < $hora_inicio || $hora_apontada >= $hora_fim) {
+                $erros[] = "O horário deve estar entre {$hora_inicio}:00 e {$hora_fim}:00.";
+            }
+
+            // Verifica conflito de horários
+            $stmt = $pdo->prepare("
+                SELECT COUNT(*) FROM agendamentos
+                WHERE id_barbeiro = ?
+                  AND status IN ('pendente','confirmado')
+                  AND (
+                        (data_inicio < ? AND data_fim > ?) OR
+                        (data_inicio < ? AND data_fim > ?)
+                      )
+            ");
+            $stmt->execute([$id_barbeiro, $data_hora_fim, $data_hora_inicio, $data_hora_fim, $data_hora_inicio]);
+            if ($stmt->fetchColumn() > 0) {
+                $erros[] = "O barbeiro já possui agendamento neste horário.";
+            }
+        }
+
+        // Inserção se não houver erros
+        if (empty($erros)) {
+            $stmt = $pdo->prepare("
+                INSERT INTO agendamentos 
+                (id_cliente, id_barbeiro, id_servico, data_inicio, data_fim, status, criado_em)
+                VALUES (?, ?, ?, ?, ?, 'pendente', NOW())
+            ");
+            if ($stmt->execute([$id_cliente, $id_barbeiro, $id_servico, $data_hora_inicio, $data_hora_fim])) {
+                $sucesso = "Agendamento criado com sucesso! Redirecionando...";
+                echo '<div class="alert alert-success mt-3">' . htmlspecialchars($sucesso) . '</div>';
+                echo '<script>setTimeout(function(){ window.location.href = "index.php"; }, 2000);</script>';
+                require_once "../../includes/footer.php";
+                exit;
+            } else {
+                $erros[] = "Erro ao criar agendamento.";
+            }
+        }
     }
 }
 ?>
@@ -86,6 +118,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <?php endif; ?>
 
     <form method="post">
+        <input type="hidden" name="csrf" value="<?= $_SESSION['csrf_token'] ?>">
+
         <div class="mb-3">
             <label>Cliente:</label>
             <select name="id_cliente" class="form-select" required>

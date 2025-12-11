@@ -3,11 +3,7 @@ require_once "../../includes/db.php";
 require_once "../../includes/header.php";
 require_once "../../includes/token.php";
 
-if (!isset($_GET['id'])) {
-    die("ID inválido.");
-}
-
-$id = $_GET['id'];
+$id = $_GET['id'] ?? 0;
 
 $stmt = $pdo->prepare("
     SELECT a.*, c.nome AS cliente, b.nome AS barbeiro, s.nome AS servico 
@@ -25,6 +21,7 @@ if (!$agendamento) {
 }
 
 $erro = "";
+$sucesso = "";
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     if (!check_csrf($_POST["token"])) {
@@ -32,7 +29,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     } else {
         $del = $pdo->prepare("DELETE FROM agendamentos WHERE id_agendamento = ?");
         if ($del->execute([$id])) {
-            header("Location: index.php");
+            $sucesso = "Agendamento cancelado com sucesso! Redirecionando...";
+            echo '<div class="alert alert-success">' . htmlspecialchars($sucesso) . '</div>';
+            echo '<script>setTimeout(function(){ window.location.href = "index.php"; }, 2000);</script>';
+            require_once "../../includes/footer.php";
             exit;
         } else {
             $erro = "Erro ao excluir.";

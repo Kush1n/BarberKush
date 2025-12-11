@@ -59,8 +59,15 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     INSERT INTO clientes (nome, cpf, telefone, email)
                     VALUES (?, ?, ?, ?)
                 ");
-                $sql->execute([$nome, $cpf, $telefone, $email]);
-                $sucesso = "Cliente cadastrado com sucesso!";
+                if ($sql->execute([$nome, $cpf, $telefone, $email])) {
+                    $sucesso = "Cliente cadastrado com sucesso! Redirecionando...";
+                    echo '<div class="alert alert-success">' . htmlspecialchars($sucesso) . '</div>';
+                    echo '<script>setTimeout(function(){ window.location.href = "index.php"; }, 2000);</script>';
+                    require_once "../../includes/footer.php";
+                    exit;
+                } else {
+                    $erro = "Erro ao cadastrar cliente.";
+                }
             }
         }
     }
@@ -71,11 +78,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
 <?php if ($erro): ?>
     <div class="alert alert-danger"><?= htmlspecialchars($erro) ?></div>
-<?php endif; ?>
-
-<?php if ($sucesso): ?>
-    <div class="alert alert-success"><?= htmlspecialchars($sucesso) ?></div>
-    <a href="index.php" class="btn btn-success mt-3">Voltar para lista de clientes</a>
 <?php endif; ?>
 
 <form method="POST">
@@ -93,7 +95,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     <label class="mt-2">Email:</label>
     <input type="email" name="email" class="form-control" placeholder="Preencha se não preencher telefone">
 
-    <button href="index.php" class="btn btn-success mt-3">Salvar</button>
+    <button type="submit" class="btn btn-success mt-3">Salvar</button>
     <a href="index.php" class="btn btn-secondary mt-3">Voltar</a>
 </form>
 

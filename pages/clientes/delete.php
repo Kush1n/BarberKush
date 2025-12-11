@@ -3,8 +3,11 @@ require_once "../../includes/db.php";
 require_once "../../includes/header.php";
 require_once "../../includes/token.php";
 
+generate_csrf();
+
 $id = $_GET['id'] ?? 0;
 
+// Busca o cliente
 $stmt = $pdo->prepare("SELECT * FROM clientes WHERE id_cliente = ?");
 $stmt->execute([$id]);
 $cliente = $stmt->fetch();
@@ -13,6 +16,7 @@ if (!$cliente) {
     die("Cliente não encontrado.");
 }
 
+// Verifica se o cliente possui agendamentos
 $check = $pdo->prepare("SELECT id_agendamento FROM agendamentos WHERE id_cliente = ?");
 $check->execute([$id]);
 
@@ -20,17 +24,21 @@ if ($check->rowCount() > 0) {
     die("<div class='alert alert-danger'>Não é possível excluir: cliente possui agendamentos.</div>");
 }
 
+// Processa exclusão
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-
     if (!check_csrf($_POST['csrf'])) {
-        die("Ação não autorizada.");
+        die("Ação não autorizada (CSRF inválido).");
     }
 
     $delete = $pdo->prepare("DELETE FROM clientes WHERE id_cliente = ?");
-    $delete->execute([$id]);
-
-    header("Location: http://localhost/BARBERKUSH/pages/clientes/");
-    exit;
+    if ($delete->execute([$id])) {
+        echo '<div class="alert alert-success">Cliente excluído com sucesso! Redirecionando...</div>';
+        echo '<script>setTimeout(function(){ window.location.href = "index.php"; }, 2000);</script>';
+        require_once "../../includes/footer.php";
+        exit;
+    } else {
+        echo '<div class="alert alert-danger">Erro ao excluir cliente.</div>';
+    }
 }
 ?>
 

@@ -4,6 +4,7 @@ require_once "../../includes/header.php";
 require_once "../../includes/token.php";
 
 $erro = "";
+$sucesso = "";
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     if (!check_csrf($_POST['csrf'])) {
@@ -18,8 +19,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         } else {
             $sql = $pdo->prepare("INSERT INTO servicos (nome, duracao_min, preco, ativo, criado_em) VALUES (?, ?, ?, 1, NOW())");
             if ($sql->execute([$nome, $duracao, $preco])) {
-                // Redireciona para o index após cadastrar
-                header("Location: index.php");
+                $sucesso = "Serviço cadastrado com sucesso! Redirecionando...";
+                echo '<div class="alert alert-success">' . htmlspecialchars($sucesso) . '</div>';
+                echo '<script>setTimeout(function(){ window.location.href = "index.php"; }, 2000);</script>';
+                require_once "../../includes/footer.php";
                 exit;
             } else {
                 $erro = "Erro ao cadastrar serviço.";

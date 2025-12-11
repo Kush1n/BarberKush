@@ -3,6 +3,8 @@ require_once "../../includes/db.php";
 require_once "../../includes/header.php";
 require_once "../../includes/token.php";
 
+generate_csrf();
+
 $id = $_GET['id'] ?? 0;
 
 $stmt = $pdo->prepare("SELECT * FROM clientes WHERE id_cliente = ?");
@@ -14,6 +16,7 @@ if (!$cliente) {
 }
 
 $erro = "";
+$sucesso = "";
 
 function validarCPF($cpf) {
     $cpf = preg_replace('/\D/', '', $cpf);
@@ -33,7 +36,6 @@ function validarTelefone($telefone) {
 }
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
-
     if (!check_csrf($_POST['csrf'])) {
         $erro = "Ação não autorizada.";
     } else {
@@ -55,10 +57,15 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 $erro = "Este CPF já está cadastrado para outro cliente.";
             } else {
                 $sql = $pdo->prepare("UPDATE clientes SET nome=?, cpf=?, telefone=?, email=? WHERE id_cliente=?");
-                $sql->execute([$nome, $cpf, $telefone, $email, $id]);
-
-                header("Location: index.php");
-                exit;
+                if ($sql->execute([$nome, $cpf, $telefone, $email, $id])) {
+                    $sucesso = "Cliente atualizado com sucesso! Redirecionando...";
+                    echo '<div class="alert alert-success">' . htmlspecialchars($sucesso) . '</div>';
+                    echo '<script>setTimeout(function(){ window.location.href = "index.php"; }, 2000);</script>';
+                    require_once "../../includes/footer.php";
+                    exit;
+                } else {
+                    $erro = "Erro ao atualizar cliente.";
+                }
             }
         }
     }

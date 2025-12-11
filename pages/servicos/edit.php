@@ -7,6 +7,7 @@ generate_csrf();
 
 $id = $_GET['id'] ?? 0;
 
+// Busca o serviço pelo ID
 $stmt = $pdo->prepare("SELECT * FROM servicos WHERE id_servico = ?");
 $stmt->execute([$id]);
 $servico = $stmt->fetch();
@@ -17,7 +18,6 @@ if (!$servico) {
 
 $erro = "";
 $sucesso = "";
-
 $nome = $servico['nome'];
 $duracao = $servico['duracao_min'];
 $preco = $servico['preco'];
@@ -35,7 +35,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         } else {
             $sql = $pdo->prepare("UPDATE servicos SET nome = ?, duracao_min = ?, preco = ? WHERE id_servico = ?");
             if ($sql->execute([$nome, $duracao, $preco, $id])) {
-                $sucesso = "Serviço atualizado com sucesso!";
+                $sucesso = "Serviço atualizado com sucesso! Redirecionando...";
+                echo '<div class="alert alert-success">' . htmlspecialchars($sucesso) . '</div>';
+                echo '<script>setTimeout(function(){ window.location.href = "index.php"; }, 2000);</script>';
+                require_once "../../includes/footer.php";
+                exit;
             } else {
                 $erro = "Erro ao atualizar serviço.";
             }
@@ -48,10 +52,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
 <?php if ($erro): ?>
     <div class="alert alert-danger"><?= htmlspecialchars($erro) ?></div>
-<?php endif; ?>
-
-<?php if ($sucesso): ?>
-    <div class="alert alert-success"><?= htmlspecialchars($sucesso) ?></div>
 <?php endif; ?>
 
 <form method="POST">

@@ -16,6 +16,7 @@ if (!$barbeiro) {
 }
 
 $erro = "";
+$sucesso = "";
 
 function validarCPF($cpf) {
     $cpf = preg_replace('/\D/', '', $cpf);
@@ -37,31 +38,36 @@ function validarTelefone($telefone) {
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     if (!check_csrf($_POST['csrf'])) {
-        die("Ação não autorizada.");
-    }
-
-    $nome = trim($_POST["nome"]);
-    $cpf = trim($_POST["cpf"]);
-    $telefone = trim($_POST["telefone"]);
-
-    if (empty($nome) || empty($cpf) || empty($telefone)) {
-        $erro = "Preencha todos os campos.";
-    } elseif (!validarCPF($cpf)) {
-        $erro = "CPF inválido. Digite 11 dígitos válidos.";
-    } elseif (!validarTelefone($telefone)) {
-        $erro = "Telefone inválido. Digite apenas números (10 ou 11 dígitos).";
+        $erro = "Ação não autorizada (CSRF inválido).";
     } else {
-        $verifica = $pdo->prepare("SELECT id_barbeiro FROM barbeiros WHERE cpf = ? AND id_barbeiro != ?");
-        $verifica->execute([$cpf, $id]);
+        $nome = trim($_POST["nome"]);
+        $cpf = trim($_POST["cpf"]);
+        $telefone = trim($_POST["telefone"]);
 
-        if ($verifica->rowCount() > 0) {
-            $erro = "Já existe um barbeiro com este CPF.";
+        if (empty($nome) || empty($cpf) || empty($telefone)) {
+            $erro = "Preencha todos os campos.";
+        } elseif (!validarCPF($cpf)) {
+            $erro = "CPF inválido. Digite 11 dígitos válidos.";
+        } elseif (!validarTelefone($telefone)) {
+            $erro = "Telefone inválido. Digite apenas números (10 ou 11 dígitos).";
         } else {
-            $sql = $pdo->prepare("UPDATE barbeiros SET nome = ?, cpf = ?, telefone = ? WHERE id_barbeiro = ?");
-            $sql->execute([$nome, $cpf, $telefone, $id]);
+            $verifica = $pdo->prepare("SELECT id_barbeiro FROM barbeiros WHERE cpf = ? AND id_barbeiro != ?");
+            $verifica->execute([$cpf, $id]);
 
-            header("Location: index.php");
-            exit;
+            if ($verifica->rowCount() > 0) {
+                $erro = "Já existe um barbeiro com este CPF.";
+            } else {
+                $sql = $pdo->prepare("UPDATE barbeiros SET nome = ?, cpf = ?, telefone = ? WHERE id_barbeiro = ?");
+                if ($sql->execute([$nome, $cpf, $telefone, $id])) {
+                    $sucesso = "Barbeiro atualizado com sucesso! Redirecionando...";
+                    echo '<div class="alert alert-success">' . htmlspecialchars($sucesso) . '</div>';
+                    echo '<script>setTimeout(function(){ window.location.href = "index.php"; }, 2000);</script>';
+                    require_once "../../includes/footer.php";
+                    exit;
+                } else {
+                    $erro = "Erro ao atualizar barbeiro.";
+                }
+            }
         }
     }
 }
