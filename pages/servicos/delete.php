@@ -9,22 +9,31 @@ $id = $_GET['id'] ?? 0;
 
 $stmt = $pdo->prepare("SELECT * FROM servicos WHERE id_servico = ?");
 $stmt->execute([$id]);
-$servico = $stmt->fetch();
+$servico = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if (!$servico) {
-    die("Serviço não encontrado.");
+    echo "<div class='alert alert-danger'>Serviço não encontrado.</div>";
+    echo '<script>setTimeout(function(){ window.location.href = "index.php"; }, 2000);</script>';
+    require_once "../../includes/footer.php";
+    exit;
 }
 
 $check = $pdo->prepare("SELECT id_agendamento FROM agendamentos WHERE id_servico = ?");
 $check->execute([$id]);
 
 if ($check->rowCount() > 0) {
-    die("<div class='alert alert-danger'>Não é possível excluir: serviço vinculado a agendamentos.</div>");
+    echo "<div class='alert alert-danger'>Não é possível excluir: serviço vinculado a agendamentos.</div>";
+    echo '<script>setTimeout(function(){ window.location.href = "index.php"; }, 2500);</script>';
+    require_once "../../includes/footer.php";
+    exit;
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!check_csrf($_POST['csrf'])) {
-        die("Ação não autorizada (CSRF inválido).");
+        echo "<div class='alert alert-danger'>Ação não autorizada (CSRF inválido).</div>";
+        echo '<script>setTimeout(function(){ window.location.href = "index.php"; }, 2500);</script>';
+        require_once "../../includes/footer.php";
+        exit;
     }
 
     $del = $pdo->prepare("DELETE FROM servicos WHERE id_servico = ?");

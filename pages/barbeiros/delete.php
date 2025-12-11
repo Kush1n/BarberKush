@@ -1,39 +1,43 @@
 <?php
 require_once "../../includes/db.php";
-<<<<<<< HEAD
 require_once "../../includes/header.php";
 require_once "../../includes/token.php";
 
-=======
-require_once "../../includes/auth.php";
-require_once "../../includes/header.php";
-require_once "../../includes/token.php";
-
-require_login();
->>>>>>> 7ce0ecb848a22d768f1366395108cce54cd029c4
 generate_csrf();
 
 $id = $_GET["id"] ?? 0;
 
+/* Busca barbeiro */
 $stmt = $pdo->prepare("SELECT * FROM barbeiros WHERE id_barbeiro = ?");
 $stmt->execute([$id]);
-$barbeiro = $stmt->fetch();
+$barbeiro = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if (!$barbeiro) {
-    die("Barbeiro não encontrado.");
+    echo "<div class='alert alert-danger'>Barbeiro não encontrado.</div>";
+    echo '<script>setTimeout(function(){ window.location.href = "index.php"; }, 2000);</script>';
+    require_once "../../includes/footer.php";
+    exit;
 }
 
+/* Verifica agendamentos vinculados */
 $check = $pdo->prepare("SELECT id_agendamento FROM agendamentos WHERE id_barbeiro = ?");
 $check->execute([$id]);
 
 if ($check->rowCount() > 0) {
-    die("<div class='alert alert-danger'>Não é possível excluir: barbeiro possui agendamentos.</div>");
+    echo "<div class='alert alert-danger'>Não é possível excluir: barbeiro possui agendamentos.</div>";
+    echo '<script>setTimeout(function(){ window.location.href = "index.php"; }, 2500);</script>';
+    require_once "../../includes/footer.php";
+    exit;
 }
 
+/* Processamento da exclusão */
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
-<<<<<<< HEAD
+
     if (!check_csrf($_POST['csrf'])) {
-        die("Ação não autorizada (CSRF inválido).");
+        echo "<div class='alert alert-danger'>Ação não autorizada (CSRF inválido).</div>";
+        echo '<script>setTimeout(function(){ window.location.href = "index.php"; }, 2500);</script>';
+        require_once "../../includes/footer.php";
+        exit;
     }
 
     $del = $pdo->prepare("DELETE FROM barbeiros WHERE id_barbeiro = ?");
@@ -45,18 +49,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     } else {
         echo '<div class="alert alert-danger">Erro ao excluir barbeiro.</div>';
     }
-=======
-
-    if (!check_csrf($_POST['csrf'])) {
-        die("Ação não autorizada.");
-    }
-
-    $del = $pdo->prepare("DELETE FROM barbeiros WHERE id_barbeiro = ?");
-    $del->execute([$id]);
-
-    header("Location: index.php");
-    exit;
->>>>>>> 7ce0ecb848a22d768f1366395108cce54cd029c4
 }
 ?>
 

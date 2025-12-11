@@ -8,13 +8,14 @@ if (session_status() === PHP_SESSION_NONE) {
 <head>
     <meta charset="UTF-8">
     <title>BarberKush</title>
+
     <link rel="stylesheet" href="/barberkush/css/style.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+
     <style>
-        
         header {
             background-color: #1c1c1c;
-            padding: px 0;
+            padding: 5px 0;
         }
 
         .logo-barberkush {
@@ -37,6 +38,7 @@ if (session_status() === PHP_SESSION_NONE) {
 
         nav a:hover {
             color: #ffc107;
+        }
 
         @media (max-width: 768px) {
             .navbar-collapse {
@@ -56,10 +58,10 @@ if (session_status() === PHP_SESSION_NONE) {
                 <img src="/barberkush/img/logo1.png" alt="BarberKush Logo" class="logo-barberkush">
                 <span class="navbar-brand-text">BarberKush</span>
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMenu"
-                    aria-controls="navbarMenu" aria-expanded="false" aria-label="Toggle navigation">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMenu">
                 <span class="navbar-toggler-icon"></span>
             </button>
+
             <div class="collapse navbar-collapse justify-content-end" id="navbarMenu">
                 <ul class="navbar-nav">
                     <li class="nav-item"><a class="nav-link" href="/barberkush/index.php">Dashboard</a></li>
@@ -72,6 +74,5 @@ if (session_status() === PHP_SESSION_NONE) {
         </nav>
     </div>
 </header>
-<main class="container mt-4">
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<main class="container mt-4">
