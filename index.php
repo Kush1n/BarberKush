@@ -54,7 +54,11 @@ require_once "includes/header.php";
                     $total_agendamentos = $pdo->query("SELECT COUNT(*) FROM agendamentos WHERE status IN ('pendente','confirmado')")->fetchColumn();
                     ?>
                     <p class="card-text display-6"><?= $total_agendamentos ?></p>
+<<<<<<< HEAD
                     <a href="../barberkush/pages/agendamentos/create.php" class="btn btn-light btn-sm">Ver agendamentos</a>
+=======
+                    <a href="/barberkush/pages/agendamentos/" class="btn btn-light btn-sm">Ver agendamentos</a>
+>>>>>>> 7ce0ecb848a22d768f1366395108cce54cd029c4
                 </div>
             </div>
         </div>

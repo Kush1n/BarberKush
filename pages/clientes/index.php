@@ -1,6 +1,11 @@
 <?php
 require_once "../../includes/db.php";
 require_once "../../includes/header.php";
+<<<<<<< HEAD
+=======
+require_once "../../includes/auth.php";
+require_login();
+>>>>>>> 7ce0ecb848a22d768f1366395108cce54cd029c4
 
 $clientes = $pdo->query("SELECT * FROM clientes ORDER BY nome ASC")->fetchAll();
 ?>

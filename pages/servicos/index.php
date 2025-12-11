@@ -1,8 +1,16 @@
 <?php
 require_once "../../includes/db.php";
+<<<<<<< HEAD
 require_once "../../includes/token.php";
 require_once "../../includes/header.php";
 
+=======
+require_once "../../includes/auth.php";
+require_once "../../includes/token.php";
+require_once "../../includes/header.php";
+
+require_login();
+>>>>>>> 7ce0ecb848a22d768f1366395108cce54cd029c4
 ?>
 
 <h2>Serviços</h2>

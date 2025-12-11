@@ -1,8 +1,16 @@
 <?php
 require_once "../../includes/db.php";
+<<<<<<< HEAD
 require_once "../../includes/header.php";
 require_once "../../includes/token.php";
 
+=======
+require_once "../../includes/auth.php";
+require_once "../../includes/header.php";
+require_once "../../includes/token.php";
+
+require_login();
+>>>>>>> 7ce0ecb848a22d768f1366395108cce54cd029c4
 generate_csrf();
 
 $id = $_GET["id"] ?? 0;
@@ -16,7 +24,10 @@ if (!$barbeiro) {
 }
 
 $erro = "";
+<<<<<<< HEAD
 $sucesso = "";
+=======
+>>>>>>> 7ce0ecb848a22d768f1366395108cce54cd029c4
 
 function validarCPF($cpf) {
     $cpf = preg_replace('/\D/', '', $cpf);
@@ -38,6 +49,7 @@ function validarTelefone($telefone) {
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     if (!check_csrf($_POST['csrf'])) {
+<<<<<<< HEAD
         $erro = "Ação não autorizada (CSRF inválido).";
     } else {
         $nome = trim($_POST["nome"]);
@@ -68,6 +80,33 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     $erro = "Erro ao atualizar barbeiro.";
                 }
             }
+=======
+        die("Ação não autorizada.");
+    }
+
+    $nome = trim($_POST["nome"]);
+    $cpf = trim($_POST["cpf"]);
+    $telefone = trim($_POST["telefone"]);
+
+    if (empty($nome) || empty($cpf) || empty($telefone)) {
+        $erro = "Preencha todos os campos.";
+    } elseif (!validarCPF($cpf)) {
+        $erro = "CPF inválido. Digite 11 dígitos válidos.";
+    } elseif (!validarTelefone($telefone)) {
+        $erro = "Telefone inválido. Digite apenas números (10 ou 11 dígitos).";
+    } else {
+        $verifica = $pdo->prepare("SELECT id_barbeiro FROM barbeiros WHERE cpf = ? AND id_barbeiro != ?");
+        $verifica->execute([$cpf, $id]);
+
+        if ($verifica->rowCount() > 0) {
+            $erro = "Já existe um barbeiro com este CPF.";
+        } else {
+            $sql = $pdo->prepare("UPDATE barbeiros SET nome = ?, cpf = ?, telefone = ? WHERE id_barbeiro = ?");
+            $sql->execute([$nome, $cpf, $telefone, $id]);
+
+            header("Location: index.php");
+            exit;
+>>>>>>> 7ce0ecb848a22d768f1366395108cce54cd029c4
         }
     }
 }

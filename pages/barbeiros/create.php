@@ -1,8 +1,16 @@
 <?php
 require_once "../../includes/db.php";
+<<<<<<< HEAD
 require_once "../../includes/header.php";
 require_once "../../includes/token.php";
 
+=======
+require_once "../../includes/auth.php";
+require_once "../../includes/header.php";
+require_once "../../includes/token.php";
+
+require_login();
+>>>>>>> 7ce0ecb848a22d768f1366395108cce54cd029c4
 generate_csrf();
 
 function validarCPF($cpf) {
@@ -28,11 +36,15 @@ function validarTelefone($telefone) {
 }
 
 $erro = "";
+<<<<<<< HEAD
 $sucesso = "";
+=======
+>>>>>>> 7ce0ecb848a22d768f1366395108cce54cd029c4
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     if (!check_csrf($_POST['csrf'])) {
+<<<<<<< HEAD
         $erro = "Ação não autorizada (CSRF inválido).";
     } else {
         $nome = trim($_POST["nome"]);
@@ -63,6 +75,38 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     $erro = "Erro ao cadastrar barbeiro.";
                 }
             }
+=======
+        die("Ação não autorizada (CSRF inválido).");
+    }
+
+    $nome = trim($_POST["nome"]);
+    $cpf = trim($_POST["cpf"]);
+    $telefone = trim($_POST["telefone"]);
+
+    if (empty($nome) || empty($cpf) || empty($telefone)) {
+        $erro = "Preencha todos os campos.";
+    }
+    elseif (!validarCPF($cpf)) {
+        $erro = "CPF inválido. Digite um CPF com 11 dígitos válido.";
+    }
+    elseif (!validarTelefone($telefone)) {
+        $erro = "Telefone inválido. Digite apenas números (10 ou 11 dígitos).";
+    }
+    else {
+        
+        $verifica = $pdo->prepare("SELECT id_barbeiro FROM barbeiros WHERE cpf = ?");
+        $verifica->execute([$cpf]);
+
+        if ($verifica->rowCount() > 0) {
+            $erro = "Já existe um barbeiro com este CPF.";
+        } else {
+            
+            $sql = $pdo->prepare("INSERT INTO barbeiros (nome, cpf, telefone) VALUES (?, ?, ?)");
+            $sql->execute([$nome, $cpf, $telefone]);
+
+            header("Location: index.php");
+            exit;
+>>>>>>> 7ce0ecb848a22d768f1366395108cce54cd029c4
         }
     }
 }
@@ -71,7 +115,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 <h2>Cadastrar Barbeiro</h2>
 
 <?php if ($erro): ?>
+<<<<<<< HEAD
     <div class="alert alert-danger"><?= htmlspecialchars($erro) ?></div>
+=======
+    <div class="alert alert-danger"><?= $erro ?></div>
+>>>>>>> 7ce0ecb848a22d768f1366395108cce54cd029c4
 <?php endif; ?>
 
 <form method="POST">

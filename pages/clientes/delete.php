@@ -2,8 +2,13 @@
 require_once "../../includes/db.php";
 require_once "../../includes/header.php";
 require_once "../../includes/token.php";
+<<<<<<< HEAD
 
 generate_csrf();
+=======
+require_once "../../includes/auth.php";
+require_login();
+>>>>>>> 7ce0ecb848a22d768f1366395108cce54cd029c4
 
 $id = $_GET['id'] ?? 0;
 
@@ -23,6 +28,7 @@ if ($check->rowCount() > 0) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+<<<<<<< HEAD
     if (!check_csrf($_POST['csrf'])) {
         die("Ação não autorizada (CSRF inválido).");
     }
@@ -36,6 +42,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         echo '<div class="alert alert-danger">Erro ao excluir cliente.</div>';
     }
+=======
+
+    if (!check_csrf($_POST['csrf'])) {
+        die("Ação não autorizada.");
+    }
+
+    $delete = $pdo->prepare("DELETE FROM clientes WHERE id_cliente = ?");
+    $delete->execute([$id]);
+
+    header("Location: http://localhost/BARBERKUSH/pages/clientes/");
+    exit;
+>>>>>>> 7ce0ecb848a22d768f1366395108cce54cd029c4
 }
 ?>
 

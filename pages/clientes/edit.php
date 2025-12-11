@@ -2,8 +2,14 @@
 require_once "../../includes/db.php";
 require_once "../../includes/header.php";
 require_once "../../includes/token.php";
+<<<<<<< HEAD
 
 generate_csrf();
+=======
+require_once "../../includes/auth.php";
+
+require_login();
+>>>>>>> 7ce0ecb848a22d768f1366395108cce54cd029c4
 
 $id = $_GET['id'] ?? 0;
 
@@ -16,7 +22,10 @@ if (!$cliente) {
 }
 
 $erro = "";
+<<<<<<< HEAD
 $sucesso = "";
+=======
+>>>>>>> 7ce0ecb848a22d768f1366395108cce54cd029c4
 
 function validarCPF($cpf) {
     $cpf = preg_replace('/\D/', '', $cpf);
@@ -36,6 +45,10 @@ function validarTelefone($telefone) {
 }
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
+<<<<<<< HEAD
+=======
+
+>>>>>>> 7ce0ecb848a22d768f1366395108cce54cd029c4
     if (!check_csrf($_POST['csrf'])) {
         $erro = "Ação não autorizada.";
     } else {
@@ -57,6 +70,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 $erro = "Este CPF já está cadastrado para outro cliente.";
             } else {
                 $sql = $pdo->prepare("UPDATE clientes SET nome=?, cpf=?, telefone=?, email=? WHERE id_cliente=?");
+<<<<<<< HEAD
                 if ($sql->execute([$nome, $cpf, $telefone, $email, $id])) {
                     $sucesso = "Cliente atualizado com sucesso! Redirecionando...";
                     echo '<div class="alert alert-success">' . htmlspecialchars($sucesso) . '</div>';
@@ -66,6 +80,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 } else {
                     $erro = "Erro ao atualizar cliente.";
                 }
+=======
+                $sql->execute([$nome, $cpf, $telefone, $email, $id]);
+
+                header("Location: index.php");
+                exit;
+>>>>>>> 7ce0ecb848a22d768f1366395108cce54cd029c4
             }
         }
     }

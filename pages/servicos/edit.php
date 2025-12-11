@@ -2,7 +2,13 @@
 require_once "../../includes/db.php";
 require_once "../../includes/header.php";
 require_once "../../includes/token.php";
+<<<<<<< HEAD
 
+=======
+require_once "../../includes/auth.php";
+
+require_login();
+>>>>>>> 7ce0ecb848a22d768f1366395108cce54cd029c4
 generate_csrf();
 
 $id = $_GET['id'] ?? 0;
@@ -17,6 +23,10 @@ if (!$servico) {
 
 $erro = "";
 $sucesso = "";
+<<<<<<< HEAD
+=======
+
+>>>>>>> 7ce0ecb848a22d768f1366395108cce54cd029c4
 $nome = $servico['nome'];
 $duracao = $servico['duracao_min'];
 $preco = $servico['preco'];
@@ -34,11 +44,15 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         } else {
             $sql = $pdo->prepare("UPDATE servicos SET nome = ?, duracao_min = ?, preco = ? WHERE id_servico = ?");
             if ($sql->execute([$nome, $duracao, $preco, $id])) {
+<<<<<<< HEAD
                 $sucesso = "Serviço atualizado com sucesso! Redirecionando...";
                 echo '<div class="alert alert-success">' . htmlspecialchars($sucesso) . '</div>';
                 echo '<script>setTimeout(function(){ window.location.href = "index.php"; }, 2000);</script>';
                 require_once "../../includes/footer.php";
                 exit;
+=======
+                $sucesso = "Serviço atualizado com sucesso!";
+>>>>>>> 7ce0ecb848a22d768f1366395108cce54cd029c4
             } else {
                 $erro = "Erro ao atualizar serviço.";
             }
@@ -53,6 +67,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     <div class="alert alert-danger"><?= htmlspecialchars($erro) ?></div>
 <?php endif; ?>
 
+<<<<<<< HEAD
+=======
+<?php if ($sucesso): ?>
+    <div class="alert alert-success"><?= htmlspecialchars($sucesso) ?></div>
+<?php endif; ?>
+
+>>>>>>> 7ce0ecb848a22d768f1366395108cce54cd029c4
 <form method="POST">
     <input type="hidden" name="csrf" value="<?= $_SESSION['csrf_token'] ?>">
 
