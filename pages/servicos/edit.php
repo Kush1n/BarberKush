@@ -1,71 +1,67 @@
 <?php
 require_once "../../includes/db.php";
-require_once "../../includes/header.php";
 require_once "../../includes/token.php";
-generate_csrf();
+require_once "../../includes/header.php";
+
+$token = generate_csrf();
 
 $id = $_GET['id'] ?? 0;
 
 $stmt = $pdo->prepare("SELECT * FROM servicos WHERE id_servico = ?");
 $stmt->execute([$id]);
-$servico = $stmt->fetch();
+$servico = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if (!$servico) {
-    die("Serviço não encontrado.");
+    echo "<div class='alert alert-danger'>Serviço não encontrado.</div>";
+    echo '<script>setTimeout(function(){ window.location.href = "index.php"; }, 1800);</script>';
+    require_once "../../includes/footer.php";
+    exit;
 }
 
-$erro = "";
-$sucesso = "";
-$nome = $servico['nome'];
-$duracao = $servico['duracao_min'];
-$preco = $servico['preco'];
+$check = $pdo->prepare("SELECT id_agendamento FROM agendamentos WHERE id_servico = ?");
+$check->execute([$id]);
 
-if ($_SERVER["REQUEST_METHOD"] === "POST") {
+if ($check->rowCount() > 0) {
+    echo "<div class='alert alert-danger'>
+            Não é possível excluir: este serviço está vinculado a agendamentos.
+          </div>";
+    echo '<script>setTimeout(function(){ window.location.href = "index.php"; }, 2000);</script>';
+    require_once "../../includes/footer.php";
+    exit;
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
     if (!check_csrf($_POST['csrf'])) {
-        $erro = "Ação não autorizada (CSRF inválido).";
-    } else {
-        $nome = trim($_POST['nome']);
-        $duracao = intval($_POST['duracao_min']);
-        $preco = floatval($_POST['preco']);
+        echo "<div class='alert alert-danger'>Ação não autorizada (CSRF inválido).</div>";
+        echo '<script>setTimeout(function(){ window.location.href = "index.php"; }, 1800);</script>';
+        require_once "../../includes/footer.php";
+        exit;
+    }
 
-        if ($duracao <= 0 || $duracao > 30) {
-            $erro = "A duração do serviço deve ser no máximo 30 minutos.";
-        } else {
-            $sql = $pdo->prepare("UPDATE servicos SET nome = ?, duracao_min = ?, preco = ? WHERE id_servico = ?");
-            if ($sql->execute([$nome, $duracao, $preco, $id])) {
-                $sucesso = "Serviço atualizado com sucesso! Redirecionando...";
-                echo '<div class="alert alert-success">' . htmlspecialchars($sucesso) . '</div>';
-                echo '<script>setTimeout(function(){ window.location.href = "index.php"; }, 2000);</script>';
-                require_once "../../includes/footer.php";
-                exit;
-            } else {
-                $erro = "Erro ao atualizar serviço.";
-            }
-        }
+    $del = $pdo->prepare("DELETE FROM servicos WHERE id_servico = ?");
+    if ($del->execute([$id])) {
+        echo "<div class='alert alert-success'>Serviço excluído com sucesso!</div>";
+        echo '<script>setTimeout(function(){ window.location.href = "index.php"; }, 1500);</script>';
+        require_once "../../includes/footer.php";
+        exit;
+    } else {
+        echo "<div class='alert alert-danger'>Erro ao excluir serviço.</div>";
+        echo '<script>setTimeout(function(){ window.location.href = "index.php"; }, 1800);</script>';
+        require_once "../../includes/footer.php";
+        exit;
     }
 }
 ?>
 
-<h2>Editar Serviço</h2>
+<h2 class="mb-3">Excluir Serviço</h2>
 
-<?php if ($erro): ?>
-    <div class="alert alert-danger"><?= htmlspecialchars($erro) ?></div>
-<?php endif; ?>
+<p>Tem certeza de que deseja excluir o serviço <strong><?= htmlspecialchars($servico['nome']) ?></strong>?</p>
 
 <form method="POST">
-    <input type="hidden" name="csrf" value="<?= $_SESSION['csrf_token'] ?>">
-
-    <label>Nome do Serviço:</label>
-    <input type="text" name="nome" class="form-control" value="<?= htmlspecialchars($nome) ?>" required>
-
-    <label class="mt-2">Duração (minutos, máximo 30):</label>
-    <input type="number" name="duracao_min" class="form-control" min="1" max="30" value="<?= htmlspecialchars($duracao) ?>" required>
-
-    <label class="mt-2">Preço:</label>
-    <input type="number" step="0.01" name="preco" class="form-control" value="<?= htmlspecialchars($preco) ?>" required>
-
-    <button type="submit" class="btn btn-success mt-3">Atualizar</button>
-    <a href="index.php" class="btn btn-secondary mt-3">Voltar</a>
+    <input type="hidden" name="csrf" value="<?= $token ?>">
+    <button class="btn btn-danger">Excluir</button>
+    <a href="index.php" class="btn btn-secondary">Cancelar</a>
 </form>
 
 <?php require_once "../../includes/footer.php"; ?>

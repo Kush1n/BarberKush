@@ -6,57 +6,95 @@ html, body {
 body {
     display: flex;
     flex-direction: column;
-    background: #111;
-    color: #fff;
+    background: #0f0f10; 
+    color: #e4e4e4;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-
-header, footer {
-    background-color: #1c1c1c;
-    color: #fff;
 }
 
 main {
     flex: 1;
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+
+header, footer {
+    background: linear-gradient(90deg, #111, #1c1c1c);
+    color: #fff;
+    border-bottom: 1px solid #2a2a2a;
+}
+
+header a, footer a {
+    color: #e9e9e9;
+    text-decoration: none;
+    font-weight: 500;
+    padding: 4px 2px;
+    transition: color .25s ease, opacity .25s ease;
+}
+
+header a:hover, footer a:hover {
+    color: #ffc107;
+    opacity: 0.85;
 }
 
 footer {
     text-align: center;
     padding: 15px 0;
+    border-top: 1px solid #222;
+    font-size: 0.95rem;
 }
 
-/* Força a prioridade sobre o Bootstrap */
 .card.card-dark {
-    background-color: #222 !important;
-    color: #fff !important;
-    border: 1px solid #000;
-    box-shadow: 0 0 10px rgba(0,0,0,0.35);
-    border-radius: 10px;
-    padding: 15px;
-    transition: transform .15s ease;
+    background: #1e1e1f !important;
+    color: #f6f6f6 !important;
+    border: 1px solid rgba(255,255,255,0.06) !important;
+    border-radius: 12px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
+    padding: 18px;
+    transition: transform .15s ease, box-shadow .15s ease;
 }
 
 .card.card-dark:hover {
     transform: translateY(-4px);
+    box-shadow: 0 10px 26px rgba(0, 0, 0, 0.6);
 }
 
 .card-title {
-    font-size: 1.2rem;
+    font-size: 1.25rem;
     font-weight: 600;
+    margin-bottom: 8px;
+    color: #ffffffd8;
 }
 
 .card-number {
-    font-size: 2.4rem;
+    font-size: 2.6rem;
     font-weight: 700;
-}
-
-header a, footer a {
+    margin-bottom: 12px;
     color: #fff;
-    text-decoration: none;
-    margin-right: 15px;
 }
 
-header a:hover, footer a:hover {
-    color: #ffc107;
-    text-decoration: underline;
+.card.card-dark .btn-light {
+    background: #f8f9fa;
+    border: none;
+    color: #111;
+    font-weight: 600;
+    padding: 6px 12px;
+    transition: background .2s ease;
+}
+
+.card.card-dark .btn-light:hover {
+    background: #dedede;
+}
+
+@media (max-width: 768px) {
+    .card.card-dark {
+        padding: 16px;
+    }
+
+    .card-number {
+        font-size: 2.2rem;
+    }
+
+    footer {
+        font-size: 0.85rem;
+    }
 }

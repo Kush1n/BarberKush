@@ -13,7 +13,7 @@ $servico = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if (!$servico) {
     echo "<div class='alert alert-danger'>Serviço não encontrado.</div>";
-    echo '<script>setTimeout(function(){ window.location.href = "index.php"; }, 2000);</script>';
+    echo '<script>setTimeout(function(){ window.location.href = "index.php"; }, 1800);</script>';
     require_once "../../includes/footer.php";
     exit;
 }
@@ -22,35 +22,41 @@ $check = $pdo->prepare("SELECT id_agendamento FROM agendamentos WHERE id_servico
 $check->execute([$id]);
 
 if ($check->rowCount() > 0) {
-    echo "<div class='alert alert-danger'>Não é possível excluir: serviço vinculado a agendamentos.</div>";
-    echo '<script>setTimeout(function(){ window.location.href = "index.php"; }, 2500);</script>';
+    echo "<div class='alert alert-danger'>
+            Não é possível excluir: este serviço está vinculado a agendamentos. Redirecionando...
+          </div>";
+    echo '<script>setTimeout(function(){ window.location.href = "index.php"; }, 2000);</script>';
     require_once "../../includes/footer.php";
     exit;
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
     if (!check_csrf($_POST['csrf'])) {
         echo "<div class='alert alert-danger'>Ação não autorizada (CSRF inválido).</div>";
-        echo '<script>setTimeout(function(){ window.location.href = "index.php"; }, 2500);</script>';
+        echo '<script>setTimeout(function(){ window.location.href = "index.php"; }, 1800);</script>';
         require_once "../../includes/footer.php";
         exit;
     }
 
     $del = $pdo->prepare("DELETE FROM servicos WHERE id_servico = ?");
     if ($del->execute([$id])) {
-        echo '<div class="alert alert-success">Serviço excluído com sucesso! Redirecionando...</div>';
-        echo '<script>setTimeout(function(){ window.location.href = "index.php"; }, 2000);</script>';
+        echo "<div class='alert alert-success'>Serviço excluído com sucesso!</div>";
+        echo '<script>setTimeout(function(){ window.location.href = "index.php"; }, 1500);</script>';
         require_once "../../includes/footer.php";
         exit;
     } else {
-        echo '<div class="alert alert-danger">Erro ao excluir serviço.</div>';
+        echo "<div class='alert alert-danger'>Erro ao excluir serviço.</div>";
+        echo '<script>setTimeout(function(){ window.location.href = "index.php"; }, 1800);</script>';
+        require_once "../../includes/footer.php";
+        exit;
     }
 }
 ?>
 
-<h2>Excluir Serviço</h2>
+<h2 class="mb-3">Excluir Serviço</h2>
 
-<p>Tem certeza que deseja excluir o serviço <strong><?= htmlspecialchars($servico['nome']) ?></strong>?</p>
+<p>Tem certeza de que deseja excluir o serviço <strong><?= htmlspecialchars($servico['nome']) ?></strong>?</p>
 
 <form method="POST">
     <input type="hidden" name="csrf" value="<?= $token ?>">

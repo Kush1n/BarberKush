@@ -7,7 +7,6 @@ generate_csrf();
 
 $id = $_GET["id"] ?? 0;
 
-/* Busca barbeiro */
 $stmt = $pdo->prepare("SELECT * FROM barbeiros WHERE id_barbeiro = ?");
 $stmt->execute([$id]);
 $barbeiro = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -19,18 +18,16 @@ if (!$barbeiro) {
     exit;
 }
 
-/* Verifica agendamentos vinculados */
 $check = $pdo->prepare("SELECT id_agendamento FROM agendamentos WHERE id_barbeiro = ?");
 $check->execute([$id]);
 
 if ($check->rowCount() > 0) {
-    echo "<div class='alert alert-danger'>Não é possível excluir: barbeiro possui agendamentos.</div>";
+    echo "<div class='alert alert-danger'>Não é possível excluir: barbeiro possui agendamentos. Redirecionando...</div>";
     echo '<script>setTimeout(function(){ window.location.href = "index.php"; }, 2500);</script>';
     require_once "../../includes/footer.php";
     exit;
 }
 
-/* Processamento da exclusão */
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     if (!check_csrf($_POST['csrf'])) {

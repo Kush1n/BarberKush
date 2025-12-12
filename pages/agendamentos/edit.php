@@ -34,17 +34,11 @@ for ($h = $hora_inicio; $h < $hora_fim; $h++) {
 $data_minima = date('Y-m-d', strtotime('+1 day'));
 
 $erro = "";
-<<<<<<< HEAD
 $sucesso = "";
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $csrf_token = $_POST["csrf"] ?? '';
     if (!check_csrf($csrf_token)) {
-=======
-
-if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    if (!check_csrf($_POST["csrf"])) {
->>>>>>> 7ce0ecb848a22d768f1366395108cce54cd029c4
         $erro = "Token inválido.";
     } else {
         $cliente_id = $_POST["cliente_id"];
@@ -56,18 +50,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         if (!$cliente_id || !$barbeiro_id || !$servico_id || !$data || !$hora) {
             $erro = "Preencha todos os campos.";
         } elseif ($data < $data_minima) {
-<<<<<<< HEAD
             $erro = "Não é possível agendar para hoje ou datas passadas.";
-=======
-            $erro = "Não é possível agendar para hoje ou datas passadas. Escolha o dia seguinte ou posterior.";
->>>>>>> 7ce0ecb848a22d768f1366395108cce54cd029c4
         } elseif (!in_array($hora, $intervalos)) {
             $erro = "Escolha um horário válido entre 09:00 e 19:00 em intervalos de 30 minutos.";
         } else {
             $stmt = $pdo->prepare("SELECT duracao_min FROM servicos WHERE id_servico = ?");
             $stmt->execute([$servico_id]);
             $duracao = $stmt->fetchColumn();
-<<<<<<< HEAD
 
             if (!$duracao) {
                 $erro = "Serviço inválido ou sem duração definida.";
@@ -104,36 +93,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 exit;
             } else {
                 $erro = "Erro ao atualizar.";
-=======
-            $data_hora_inicio = $data . ' ' . $hora;
-            $data_hora_fim = date('Y-m-d H:i:s', strtotime("+$duracao minutes", strtotime($data_hora_inicio)));
-
-            $stmt = $pdo->prepare("
-                SELECT COUNT(*) FROM agendamentos
-                WHERE id_barbeiro = ?
-                  AND status IN ('pendente','confirmado')
-                  AND id_agendamento <> ?
-                  AND (
-                        (data_inicio < ? AND data_fim > ?) OR
-                        (data_inicio < ? AND data_fim > ?)
-                      )
-            ");
-            $stmt->execute([$barbeiro_id, $id, $data_hora_fim, $data_hora_inicio, $data_hora_fim, $data_hora_inicio]);
-            if ($stmt->fetchColumn() > 0) {
-                $erro = "O barbeiro já possui agendamento neste horário.";
-            }
-
-            if (!$erro) {
-                $sql = $pdo->prepare("UPDATE agendamentos 
-                                      SET id_cliente = ?, id_barbeiro = ?, id_servico = ?, data_inicio = ?, data_fim = ?
-                                      WHERE id_agendamento = ?");
-                if ($sql->execute([$cliente_id, $barbeiro_id, $servico_id, $data_hora_inicio, $data_hora_fim, $id])) {
-                    header("Location: index.php");
-                    exit;
-                } else {
-                    $erro = "Erro ao atualizar.";
-                }
->>>>>>> 7ce0ecb848a22d768f1366395108cce54cd029c4
             }
         }
     }
@@ -195,7 +154,4 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 </form>
 
 <?php require_once "../../includes/footer.php"; ?>
-<<<<<<< HEAD
 <?php
-=======
->>>>>>> 7ce0ecb848a22d768f1366395108cce54cd029c4

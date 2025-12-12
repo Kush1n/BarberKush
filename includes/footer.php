@@ -1,33 +1,58 @@
 </main>
 
-<footer class="bg-dark text-white mt-5 py-4">
+<footer class="footer-dark mt-5 py-4">
     <div class="container d-flex flex-column flex-md-row justify-content-between align-items-center">
-        <p class="mb-2 mb-md-0">&copy; 2025 <strong>BarberKush</strong> — Sistema de Barbearia</p>
-        <div class="d-flex flex-column flex-md-row">
-            <a href="#" class="text-white me-md-3 mb-2 mb-md-0 text-decoration-none hover-footer">Política de Privacidade</a>
-            <a href="#" class="text-white text-decoration-none hover-footer">Contato</a>
+        
+        <p class="footer-text mb-2 mb-md-0">
+            &copy; 2025 <strong>BarberKush</strong> — Sistema de Barbearia
+        </p>
+
+        <div class="d-flex flex-column flex-md-row footer-links">
+            <a href="#" class="footer-link me-md-3 mb-2 mb-md-0">Política de Privacidade</a>
+            <a href="#" class="footer-link">Contato</a>
         </div>
+
     </div>
 </footer>
 
 <style>
-    footer {
+    .footer-dark {
+        background: #141414;
         border-top: 3px solid #ffc107;
-        background-color: #1c1c1c;
+        color: #e0e0e0;
+        box-shadow: 0 -2px 10px rgba(0,0,0,0.35);
     }
 
-    footer a.hover-footer:hover {
+    .footer-text {
+        font-size: 0.95rem;
+        opacity: 0.9;
+    }
+
+    .footer-link {
+        color: #e0e0e0;
+        text-decoration: none;
+        font-weight: 500;
+        transition: color .2s ease, opacity .2s ease;
+    }
+
+    .footer-link:hover {
         color: #ffc107;
+        opacity: 1;
         text-decoration: underline;
     }
 
+    .footer-links {
+        gap: 0.4rem;
+    }
+
     @media (max-width: 768px) {
-        footer .container {
+        .footer-dark .container {
             text-align: center;
         }
-        footer .d-flex.flex-column.flex-md-row {
+
+        .footer-links {
             flex-direction: column;
-            gap: 0.5rem;
+            gap: 0.6rem;
         }
     }
 </style>
